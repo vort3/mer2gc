@@ -90,14 +90,12 @@ def process_leg(leg, calendar, username):
     if end < start:
         end += datetime.timedelta(days=1)
     flight = f"{start.date().isoformat()} {fnumber}"
-    print(f"Current flight:\t{flight}")
+    logging.info(f"Current flight:\t{flight}")
     existing = list(calendar.get_events(time_min=start.date(),
                     time_max=end.date(), query=title, timezone='Etc/UTC'))
     if existing:
-        print(f"Existing event found:\t{existing[0].start.date()}",
-              f"{existing[0].summary}")
         if existing[0].start == start and existing[0].end == end:
-            print("Start and end times match. Skipping…")
+            logging.info("Start and end times match. Skipping…")
             return
         print("Updating event…",
               f"{str(existing[0].start)[:16]} - {str(existing[0].end)[:16]}",
@@ -113,7 +111,7 @@ def process_leg(leg, calendar, username):
     event.description = "Created by Meridian2GC"
     print(f"Generated event:\t{title}")
     calendar.add_event(event)
-    print("Event added")
+    logging.info("Event added")
 
 
 def main():
@@ -129,9 +127,14 @@ def main():
 
     if "-a" in sys.argv:
         alternative = True
-        logging.basicConfig(level=logging.INFO)
     else:
         alternative = False
+
+    if "-q" in sys.argv:
+        logging.basicConfig(level=logging.WARNING)
+    else:
+        logging.basicConfig(level=logging.INFO)
+        
 
     pagetext = get_pagetext(conf['url'], conf['login'], conf['password'])
     username = get_username(pagetext, alternative=alternative)
