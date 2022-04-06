@@ -24,6 +24,7 @@ locations = {
     "BQS": "Ignatievo Airport, Ignatyevskaya Rd, Blagoveshchensk, Amurskaya oblast', Russia, 675019",
     "BUD": "Budapest Airport, Budapest, 1185 Hungary",
     "CIT": "Airport, 9F8V+F6G, Shymkent, Kazakhstan",
+    "DAC": "Hazrat Shahjalal International Airport",
     "DMB": "Taraz Airport, ул. Аэропорт б/н, Taraz 080000, Kazakhstan",
     "DWC": "Al Maktoum International Airport, Emirates Rd - Dubai - United Arab Emirates",
     "GUW": "Atyrau International Airport, Abulkhair Khan Ave 22, Atyrau 060000, Kazakhstan",
@@ -55,7 +56,6 @@ locations = {
     "VKO": "Vnukovo International Airport, Vnukovo, Moscow Oblast, Russia",
     "VNO": "Vilnius International Airport, Rodūnios kl. 10A, Vilnius 02189, Lithuania",
     "XIY": "Xi'an Xianyang International Airport, Weicheng, Xianyang, Shaanxi, China",
-    "DAC": "Hazrat Shahjalal International Airport",
 }
 
 
