@@ -129,6 +129,8 @@ def process_leg(leg, calendar, username):
     start = start.replace(tzinfo=datetime.timezone.utc)
     end = datetime.datetime.strptime(leg[0]+leg[4], '%d.%m.%Y%H:%M')
     end = end.replace(tzinfo=datetime.timezone.utc)
+    if end < start:
+        end += datetime.timedelta(days=1)
     flight = f"{start.date().isoformat()} {fnumber}"
     print(f"Current flight:\t{flight}")
     existing = list(calendar.get_events(time_min=start.date(),
