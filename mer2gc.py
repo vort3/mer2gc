@@ -43,7 +43,6 @@ def get_username(pagetext, alternative=False):
 
     match = re.findall(pattern, pagetext)
     if len(match) == 0:
-        logging.info(pagetext)
         return
     return match[0]
 
@@ -140,11 +139,14 @@ def main():
         logging.basicConfig(format="[%(levelname)s]\t%(message)s",
                             level=logging.INFO, stream=sys.stdout)
         
-    while True:    
+    for i in range(10):
         pagetext = get_pagetext(conf['url'], conf['login'], conf['password'])
         username = get_username(pagetext, alternative=alternative)
         if username != None:
             break
+    else:
+        logging.warning("Unable to load page text.")
+        return
 
     legs = get_legs(pagetext, alternative=alternative)
     
