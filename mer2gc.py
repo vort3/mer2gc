@@ -131,9 +131,9 @@ def main():
         alternative = False
 
     if "-q" in sys.argv:
-        logging.basicConfig(level=logging.WARNING)
+        logging.basicConfig(level=logging.WARNING, stream=sys.stdout)
     else:
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.INFO, stream=sys.stdout)
         
 
     pagetext = get_pagetext(conf['url'], conf['login'], conf['password'])
