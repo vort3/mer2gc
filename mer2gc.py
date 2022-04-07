@@ -42,6 +42,9 @@ def get_username(pagetext, alternative=False):
         pattern = "\n([A-Z]+ [A-Z]+)\n"
 
     match = re.findall(pattern, pagetext)
+    if len(match) == 0:
+        logging.info(pagetext)
+        return
     return match[0]
 
 
@@ -135,9 +138,12 @@ def main():
     else:
         logging.basicConfig(level=logging.INFO, stream=sys.stdout)
         
+    while True:    
+        pagetext = get_pagetext(conf['url'], conf['login'], conf['password'])
+        username = get_username(pagetext, alternative=alternative)
+        if username != None:
+            break
 
-    pagetext = get_pagetext(conf['url'], conf['login'], conf['password'])
-    username = get_username(pagetext, alternative=alternative)
     legs = get_legs(pagetext, alternative=alternative)
     
     for leg in legs:
