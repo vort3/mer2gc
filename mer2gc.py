@@ -42,10 +42,10 @@ def get_username(pagetext, alternative=False):
         logging.info("Using alternative pattern to parse username.")
         pattern = "\n([A-Z]+ [A-Z]+)\n"
 
-    match = re.findall(pattern, pagetext)
-    if len(match) == 0:
+    match = re.search(pattern, pagetext)
+    if match is None:
         return
-    return match[0]
+    return match.group(1)
 
 
 def get_legs(pagetext, alternative=False):
