@@ -37,7 +37,7 @@ def get_pagetext(url, login, password):
 def get_username(pagetext, alternative=False):
     if not alternative:
         # For when bs4 eats all newlines
-        pattern = "\s(?P<username>[A-Z]+ [A-Z]+)\s+.*?7" 
+        pattern = "\s(?P<username>[A-Z]+ [A-Z]+)\s+.*?7"
     elif alternative:
         logging.info("Using alternative pattern to parse username.")
         pattern = "\n(?P<username>[A-Z]+ [A-Z]+)\n"
@@ -74,12 +74,11 @@ def get_legs(pagetext, alternative=False):
                     "\n.*\n"
                     "(?P<crew>.*)" )
 
-    match = re.findall(pattern, pagetext)
-    legs = list(map(list, match))
+    legs = [m.groupdict() for m in re.finditer(pattern, pagetext)]
     
     for i, leg in enumerate(legs):
-        if leg[0] == '':
-            leg[0] = legs[i-1][0]
+        if leg["date"] == None:
+            leg["date"] = legs[i-1]["date"]
     
     return legs
 
@@ -97,26 +96,24 @@ def get_reserves(pagetext, alternative=False):
         logging.info("Warning: Not implemented yet")
         pattern = ""
 
-    match = re.findall(pattern, pagetext)
-    reserves = list(map(list, match))
+    reserves = [m.groupdict() for m in re.finditer(pattern, pagetext)]
     
     for i, reserve in enumerate(reserves):
-        if reserve[0] == '':
-            reserve[0] = reserves[i-1][0]
+        if reserve["date"] == None:
+            reserve["date"] = reserves[i-1]["date"]
     
-    logging.debug(reserves)
     return reserves
 
 
 def process_leg(leg, calendar, username):
-    fnumber = leg[3]
-    dep = leg[2]
-    dest = leg[5]
-    title = f"{dep}-{dest} {fnumber} (PAX)" if f"{username} [pax]" in leg[6] \
+    fnumber = leg["fnumber"]
+    dep = leg["dep"]
+    dest = leg["dest"]
+    title = f"{dep}-{dest} {fnumber} (PAX)" if f"{username} [pax]" in leg["crew"] \
                                             else f"{dep}-{dest} {fnumber}"
-    start = datetime.datetime.strptime(leg[0]+leg[1], "%d.%m.%Y%H:%M")
+    start = datetime.datetime.strptime(leg["date"]+leg["start"], "%d.%m.%Y%H:%M")
     start = start.replace(tzinfo=datetime.timezone.utc)
-    end = datetime.datetime.strptime(leg[0]+leg[4], "%d.%m.%Y%H:%M")
+    end = datetime.datetime.strptime(leg["date"]+leg["end"], "%d.%m.%Y%H:%M")
     end = end.replace(tzinfo=datetime.timezone.utc)
     if end < start:
         end += datetime.timedelta(days=1)
@@ -147,9 +144,9 @@ def process_leg(leg, calendar, username):
 
 def process_reserve(reserve, calendar):
     title = "RESERVE"
-    start = datetime.datetime.strptime(reserve[0]+reserve[1], "%d.%m.%Y%H:%M")
+    start = datetime.datetime.strptime(reserve["date"]+reserve["start"], "%d.%m.%Y%H:%M")
     start = start.replace(tzinfo=datetime.timezone.utc)
-    end = datetime.datetime.strptime(reserve[0]+reserve[3], "%d.%m.%Y%H:%M")
+    end = datetime.datetime.strptime(reserve["date"]+reserve["end"], "%d.%m.%Y%H:%M")
     end = end.replace(tzinfo=datetime.timezone.utc)
     if end < start:
         end += datetime.timedelta(days=1)
@@ -168,12 +165,12 @@ def process_reserve(reserve, calendar):
         return
     event = Event(title, start, end)
     event.timezone = "Etc/UTC"
-
+    
     last_event = list(calendar.get_events(time_min=datetime.datetime.now() -
                              datetime.timedelta(days=30),
                              time_max=start))[-1]
     event.location = last_event.location
-
+    
     event.add_popup_reminder(minutes_before_start=180)
     event.description = "Created by Meridian2GC"
     print(f"Generated event:\t{title}")
