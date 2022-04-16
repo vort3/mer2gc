@@ -80,6 +80,28 @@ def get_legs(pagetext, alternative=False):
     return legs
 
 
+def get_reserves(pagetext, alternative=False):
+    if not alternative:
+        # For when bs4 eats all newlines:
+        pattern = ( "(?:(\d{2}\.\d{2}\.\d{4})\s*\([A-Z][a-z]{2}\)\n*)?\s*"
+                    "(\d{2}:\d{2})\s*"
+                    "(Рез.*?)\s*"
+                    "(\d{2}:\d{2})" )
+    elif alternative:
+        logging.info("Using alternative pattern to parse reserves.")
+        logging.info("Warning: Not yet implemented")
+
+    match = re.findall(pattern, pagetext)
+    reserves = list(map(list, match))
+    
+    for i, reserve in enumerate(reserves):
+        if reserve[0] == '':
+            reserve[0] = reserves[i-1][0]
+    
+    logging.debug(reserves)
+    return reserves
+
+
 def process_leg(leg, calendar, username):
     fnumber = leg[3]
     dep = leg[2]
@@ -110,6 +132,42 @@ def process_leg(leg, calendar, username):
     event = Event(title, start, end)
     event.timezone = "Etc/UTC"
     event.location = locations.locations.get(dest, "Unknown location")
+    event.add_popup_reminder(minutes_before_start=180)
+    event.description = "Created by Meridian2GC"
+    print(f"Generated event:\t{title}")
+    calendar.add_event(event)
+    logging.info("Event added")
+
+
+def process_reserve(reserve, calendar):
+    title = "RESERVE"
+    start = datetime.datetime.strptime(reserve[0]+reserve[1], '%d.%m.%Y%H:%M')
+    start = start.replace(tzinfo=datetime.timezone.utc)
+    end = datetime.datetime.strptime(reserve[0]+reserve[3], '%d.%m.%Y%H:%M')
+    end = end.replace(tzinfo=datetime.timezone.utc)
+    if end < start:
+        end += datetime.timedelta(days=1)
+    existing = list(calendar.get_events(time_min=start.date(),
+                    time_max=end.date(), query=title, timezone='Etc/UTC'))
+    if existing:
+        if existing[0].start == start and existing[0].end == end:
+            logging.info("Start and end times match. Skipping…")
+            return
+        print("Updating event…",
+              f"{str(existing[0].start)[:16]} - {str(existing[0].end)[:16]}",
+              f"---> {str(start)[:16]} - {str(end)[:16]}")
+        existing[0].start = start
+        existing[0].end = end
+        calendar.update_event(existing[0])
+        return
+    event = Event(title, start, end)
+    event.timezone = "Etc/UTC"
+
+    last_event = list(calendar.get_events(time_min=datetime.datetime.now() -
+                             datetime.timedelta(days=30),
+                             time_max=datetime.datetime.now()))[-1]
+    event.location = last_event.location
+
     event.add_popup_reminder(minutes_before_start=180)
     event.description = "Created by Meridian2GC"
     print(f"Generated event:\t{title}")
@@ -153,9 +211,12 @@ def main():
         return
 
     legs = get_legs(pagetext, alternative=alternative)
-    
     for leg in legs:
         process_leg(leg, calendar, username)
+    
+    reserves = get_reserves(pagetext, alternative=alternative)
+    for reserve in reserves:
+        process_reserve(reserve, calendar)
 
 
 if __name__ == "__main__":
