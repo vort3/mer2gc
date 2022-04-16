@@ -30,6 +30,7 @@ def get_pagetext(url, login, password):
         drv.find_element(By.CLASS_NAME, "z-button").click()
         drv.get(url + "/web.meridian/workplan.zul")
         pagetext = BeautifulSoup(drv.page_source, "html.parser").get_text()
+        logging.debug(pagetext)
         return pagetext
 
 
@@ -132,7 +133,10 @@ def main():
     else:
         alternative = False
 
-    if "-q" in sys.argv:
+    if "-v" in sys.argv:
+        logging.basicConfig(format="[%(levelname)s]\t%(message)s",
+                            level=logging.DEBUG, stream=sys.stdout)
+    elif "-q" in sys.argv:
         logging.basicConfig(format="[%(levelname)s]\t%(message)s",
                             level=logging.WARNING, stream=sys.stdout)
     else:
