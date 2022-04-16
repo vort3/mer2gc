@@ -165,7 +165,7 @@ def process_reserve(reserve, calendar):
 
     last_event = list(calendar.get_events(time_min=datetime.datetime.now() -
                              datetime.timedelta(days=30),
-                             time_max=datetime.datetime.now()))[-1]
+                             time_max=start))[-1]
     event.location = last_event.location
 
     event.add_popup_reminder(minutes_before_start=180)
