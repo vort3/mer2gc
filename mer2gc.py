@@ -37,10 +37,10 @@ def get_pagetext(url, login, password):
 def get_username(pagetext, alternative=False):
     if not alternative:
         # For when bs4 eats all newlines
-        pattern = "\s([A-Z]+ [A-Z]+)\s+.*?7" 
+        pattern = "\s(?P<username>[A-Z]+ [A-Z]+)\s+.*?7" 
     elif alternative:
         logging.info("Using alternative pattern to parse username.")
-        pattern = "\n([A-Z]+ [A-Z]+)\n"
+        pattern = "\n(?P<username>[A-Z]+ [A-Z]+)\n"
 
     match = re.search(pattern, pagetext)
     if match is None:
@@ -51,24 +51,28 @@ def get_username(pagetext, alternative=False):
 def get_legs(pagetext, alternative=False):
     if not alternative:
         # For when bs4 eats all newlines:
-        pattern = ( "(?:(\d{2}\.\d{2}\.\d{4})\s*\([A-Z][a-z]{2}\)\n*)?\s*"
-                    "(\d{2}:\d{2})([A-Z]{3})\s*"
-                    "(DV\d{3,4}D?).*?"
-                    "(\d{2}:\d{2})"
+        pattern = ( "(?:(?P<date>\d{2}\.\d{2}\.\d{4})\s*"
+                    "\([A-Z][a-z]{2}\)\n*)?\s*"
+                    "(?P<start>\d{2}:\d{2})"
+                    "(?P<dep>[A-Z]{3})\s*"
+                    "(?P<fnumber>DV\d{3,4}D?).*?"
+                    "(?P<end>\d{2}:\d{2})"
                     "(?:\s*\(\+1\))?"
-                    "([A-Z]{3})(.*?):" )
+                    "(?P<dest>[A-Z]{3})"
+                    "(?P<crew>.*?):" )
     elif alternative:
         # When each cell is on a separate line:
         logging.info("Using alternative pattern to parse legs.")
-        pattern = ( "(?:(\d{2}\.\d{2}\.\d{4})\s\([A-Z][a-z]{2}\)\n{3,4})?"
-                    "(\d{2}:\d{2})"
-                    "([A-Z]{3})\n"
-                    "(DV\d{3,4}D?).*\n"
-                    "(\d{2}:\d{2})"
+        pattern = ( "(?:(?P<date>\d{2}\.\d{2}\.\d{4})\s"
+                    "\([A-Z][a-z]{2}\)\n{3,4})?"
+                    "(?P<start>\d{2}:\d{2})"
+                    "(?P<dep>[A-Z]{3})\n"
+                    "(?P<fnumber>DV\d{3,4}D?).*\n"
+                    "(?P<end>\d{2}:\d{2})"
                     "(?:\s\(\+1\))?"
-                    "([A-Z]{3})"
+                    "(?P<dest>[A-Z]{3})"
                     "\n.*\n"
-                    "(.*)" )
+                    "(?P<crew>.*)" )
 
     match = re.findall(pattern, pagetext)
     legs = list(map(list, match))
@@ -83,13 +87,15 @@ def get_legs(pagetext, alternative=False):
 def get_reserves(pagetext, alternative=False):
     if not alternative:
         # For when bs4 eats all newlines:
-        pattern = ( "(?:(\d{2}\.\d{2}\.\d{4})\s*\([A-Z][a-z]{2}\)\n*)?\s*"
-                    "(\d{2}:\d{2})\s*"
-                    "(Рез.*?)\s*"
-                    "(\d{2}:\d{2})" )
+        pattern = ( "(?:(?P<date>\d{2}\.\d{2}\.\d{4})\s*"
+                    "\([A-Z][a-z]{2}\)\n*)?\s*"
+                    "(?P<start>\d{2}:\d{2})\s*"
+                    "(?P<title>Рез.*?)\s*"
+                    "(?P<end>\d{2}:\d{2})" )
     elif alternative:
         logging.info("Using alternative pattern to parse reserves.")
         logging.info("Warning: Not implemented yet")
+        pattern = ""
 
     match = re.findall(pattern, pagetext)
     reserves = list(map(list, match))
