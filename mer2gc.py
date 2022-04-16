@@ -89,7 +89,7 @@ def get_reserves(pagetext, alternative=False):
                     "(\d{2}:\d{2})" )
     elif alternative:
         logging.info("Using alternative pattern to parse reserves.")
-        logging.info("Warning: Not yet implemented")
+        logging.info("Warning: Not implemented yet")
 
     match = re.findall(pattern, pagetext)
     reserves = list(map(list, match))
@@ -106,18 +106,18 @@ def process_leg(leg, calendar, username):
     fnumber = leg[3]
     dep = leg[2]
     dest = leg[5]
-    title = f'{dep}-{dest} {fnumber} (PAX)' if f"{username} [pax]" in leg[6] \
-                                            else f'{dep}-{dest} {fnumber}'
-    start = datetime.datetime.strptime(leg[0]+leg[1], '%d.%m.%Y%H:%M')
+    title = f"{dep}-{dest} {fnumber} (PAX)" if f"{username} [pax]" in leg[6] \
+                                            else f"{dep}-{dest} {fnumber}"
+    start = datetime.datetime.strptime(leg[0]+leg[1], "%d.%m.%Y%H:%M")
     start = start.replace(tzinfo=datetime.timezone.utc)
-    end = datetime.datetime.strptime(leg[0]+leg[4], '%d.%m.%Y%H:%M')
+    end = datetime.datetime.strptime(leg[0]+leg[4], "%d.%m.%Y%H:%M")
     end = end.replace(tzinfo=datetime.timezone.utc)
     if end < start:
         end += datetime.timedelta(days=1)
     flight = f"{start.date().isoformat()} {fnumber}"
     logging.info(f"Current flight:\t{flight}")
     existing = list(calendar.get_events(time_min=start.date(),
-                    time_max=end.date(), query=title, timezone='Etc/UTC'))
+                    time_max=end.date(), query=title, timezone="Etc/UTC"))
     if existing:
         if existing[0].start == start and existing[0].end == end:
             logging.info("Start and end times match. Skipping…")
@@ -141,14 +141,14 @@ def process_leg(leg, calendar, username):
 
 def process_reserve(reserve, calendar):
     title = "RESERVE"
-    start = datetime.datetime.strptime(reserve[0]+reserve[1], '%d.%m.%Y%H:%M')
+    start = datetime.datetime.strptime(reserve[0]+reserve[1], "%d.%m.%Y%H:%M")
     start = start.replace(tzinfo=datetime.timezone.utc)
-    end = datetime.datetime.strptime(reserve[0]+reserve[3], '%d.%m.%Y%H:%M')
+    end = datetime.datetime.strptime(reserve[0]+reserve[3], "%d.%m.%Y%H:%M")
     end = end.replace(tzinfo=datetime.timezone.utc)
     if end < start:
         end += datetime.timedelta(days=1)
     existing = list(calendar.get_events(time_min=start.date(),
-                    time_max=end.date(), query=title, timezone='Etc/UTC'))
+                    time_max=end.date(), query=title, timezone="Etc/UTC"))
     if existing:
         if existing[0].start == start and existing[0].end == end:
             logging.info("Start and end times match. Skipping…")
