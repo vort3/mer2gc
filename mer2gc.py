@@ -37,7 +37,7 @@ def get_pagetext(url, login, password):
 def get_username(pagetext, alternative=False):
     if not alternative:
         # For when bs4 eats all newlines
-        pattern = "\s(?P<username>[A-Z]+ [A-Z]+)\s+.*?7" 
+        pattern = "\s(?P<username>[A-Z]+ [A-Z]+)\s+.*?7"
     elif alternative:
         logging.info("Using alternative pattern to parse username.")
         pattern = "\n(?P<username>[A-Z]+ [A-Z]+)\n"
@@ -165,12 +165,12 @@ def process_reserve(reserve, calendar):
         return
     event = Event(title, start, end)
     event.timezone = "Etc/UTC"
-
+    
     last_event = list(calendar.get_events(time_min=datetime.datetime.now() -
                              datetime.timedelta(days=30),
                              time_max=start))[-1]
     event.location = last_event.location
-
+    
     event.add_popup_reminder(minutes_before_start=180)
     event.description = "Created by Meridian2GC"
     print(f"Generated event:\t{title}")
