@@ -125,9 +125,10 @@ def process_leg(leg, calendar, username):
         if existing[0].start == start and existing[0].end == end:
             logging.info("Start and end times match. Skipping…")
             return
-        print("Updating event…",
-              f"{str(existing[0].start)[:16]} - {str(existing[0].end)[:16]}",
-              f"---> {str(start)[:16]} - {str(end)[:16]}")
+        print(f"{fnumber}:\t"
+              f"{str(existing[0].start)[:16]} - {str(existing[0].end)[:16]}")
+        print(f"{fnumber}:\t"
+              f"{str(start)[:16]} - {str(end)[:16]}")
         existing[0].start = start
         existing[0].end = end
         calendar.update_event(existing[0])
