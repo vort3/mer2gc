@@ -87,8 +87,7 @@ def process_event(event, calendar):
     if " (+1)" in event["arrival"]:
         end += datetime.timedelta(days=1)
     
-    flight = f"{start.date().isoformat()} {fnumber}"
-    logging.info(f"Current flight:\t{flight}")
+    logging.info(f"Current event:\t{start.date().isoformat()} {fnumber}")
     existing = list(calendar.get_events(time_min=start.date(),
                     time_max=end.date(), query=title, timezone="Etc/UTC"))
     if existing:
