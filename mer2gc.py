@@ -10,8 +10,7 @@ from google.oauth2 import service_account
 from gcsa.google_calendar import GoogleCalendar
 from gcsa.event import Event
 from bs4 import BeautifulSoup
-import locations
-import cellkeys
+import keys
 import datetime
 import logging
 import json
@@ -51,7 +50,7 @@ def get_events(src):
             for span in cell.select("span"):
                 if "display:none" not in span.get("style", ""):
                     content.append(span.text)
-            event[cellkeys.cellkeys[i]] = content
+            event[keys.cellkeys[i]] = content
         events.append(event)
     
     for i, event in enumerate(events):
@@ -106,7 +105,7 @@ def process_event(event, calendar):
         return
     event = Event(title, start, end)
     event.timezone = "Etc/UTC"
-    event.location = locations.locations.get(arr, "Unknown location")
+    event.location = keys.locations.get(arr, "Unknown location")
     event.add_popup_reminder(minutes_before_start=180)
     event.description = "Created by Meridian2GC"
     print(f"Generated event:\t{title}")
