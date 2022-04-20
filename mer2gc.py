@@ -71,6 +71,9 @@ def process_event(event, calendar):
     dep = event["departure"][-1]
     arr = event["arrival"][-1]
     ac = event["event"][-1]
+    
+    for i, _ in enumerate(event["crew"]):
+        event["crew"][i] = event["crew"][i].replace(" 7", " +7", 1)
     crew = "\n".join(event["crew"])
     
     if "Passenger on task" in event["info"]:
