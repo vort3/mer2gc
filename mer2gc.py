@@ -47,7 +47,8 @@ def get_events(src):
         event = {}
         for i, cell in enumerate(row.select(".z-listcell-content")):
             content = []
-            for span in cell.select("span"):
+            selector = ".popup-crew-list span" if i == 4 else "span"
+            for span in cell.select(selector):
                 if "display:none" not in span.get("style", ""):
                     content.append(span.text)
             event[keys.cellkeys[i]] = content
