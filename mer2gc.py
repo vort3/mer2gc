@@ -114,6 +114,11 @@ def process_event(event, calendar):
     logging.info("Event added")
 
 
+def check_documents(src):
+    docs = src.select(".main-template-header span")[2].text
+    if docs != "0": print(f"You have {docs} unaquainted documents!")
+
+
 def main():
     configpath = os.path.join(os.path.expanduser("~"), ".config", "mer2gc")
     with open(os.path.join(configpath, "config.json")) as fp:
@@ -139,6 +144,8 @@ def main():
     events = get_events(src)
     for event in events:
         process_event(event, calendar)
+    
+    check_documents(src)
 
 
 if __name__ == "__main__":
