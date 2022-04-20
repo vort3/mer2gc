@@ -72,7 +72,7 @@ def process_event(event, calendar):
     arr = event["arrival"][-1]
     ac = event["event"][-1]
     
-    for i, _ in enumerate(event["crew"]):
+    for i in range(len(event["crew"])):
         event["crew"][i] = event["crew"][i].replace(" 7", " +7", 1)
     crew = "\n".join(event["crew"])
     
