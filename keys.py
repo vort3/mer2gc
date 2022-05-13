@@ -35,6 +35,7 @@ locations = {
     "SSH": "Sharm El Sheikh International Airport, 2 El-Salam, Qesm Sharm Ash Sheikh, South Sinai Governorate, Egypt",
     "SYX": "Sanya Phoenix International Airport, Fenghuangzhen, Tianya, Sanya, Hainan, China, 572000",
     "TSE": "Nursultan Nazarbayev International Airport, Astana 020000, Kazakhstan",
+    "UGC": "Urgench International Airport",
     "UKK": "Aeroport Ust'-Kamenogorska, Ust'-Kamenogorsk 070000, Kazakhstan",
     "URA": "Ақжол халықаралық әуежайы, Тұқпай, Kazakhstan",
     "VKO": "Vnukovo International Airport, Vnukovo, Moscow Oblast, Russia",
