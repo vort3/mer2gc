@@ -19,30 +19,32 @@ import os
 
 
 def get_pagesource(url, login, password):
+    # Page source is a raw html source of rendered web page
+
     opt = Options()
     opt.headless = True
     opt.add_argument("-private")
     s = Service('/usr/bin/geckodriver', log_path=os.devnull)
 
-    with webdriver.Firefox(options=opt, service=s) as drv:
-        drv.get(url)
-        WebDriverWait(drv, 30).until(EC.visibility_of_element_located(
-                                    (By.CLASS_NAME, "z-button")))
-        drv.find_elements(By.CLASS_NAME, "z-textbox")[0].send_keys(login)
-        drv.find_elements(By.CLASS_NAME, "z-textbox")[1].send_keys(password)
-        drv.find_element(By.CLASS_NAME, "z-button").click()
-        drv.get(url + "/web.meridian/workplan.zul")
-        WebDriverWait(drv, 30).until(EC.visibility_of_element_located(
+    with webdriver.Firefox(options=opt, service=s) as driver:
+        driver.get(url)
+        WebDriverWait(driver, 30).until(EC.visibility_of_element_located(
+                                       (By.CLASS_NAME, "z-button")))
+        driver.find_elements(By.CLASS_NAME, "z-textbox")[0].send_keys(login)
+        driver.find_elements(By.CLASS_NAME, "z-textbox")[1].send_keys(password)
+        driver.find_element(By.CLASS_NAME, "z-button").click()
+        driver.get(url + "/web.meridian/workplan.zul")
+        WebDriverWait(driver, 30).until(EC.visibility_of_element_located(
                                     (By.CLASS_NAME, "fio")))
-        src = BeautifulSoup(drv.page_source, "html.parser")
-        logging.debug(src)
-        return src
+        source = BeautifulSoup(driver.page_source, "html.parser")
+        logging.debug(source)
+        return source
 
 
-def get_events(src):
-    events = []
+def get_events(source):
+    event_list = []
 
-    rows = src.select(".z-listitem")
+    rows = source.select(".z-listitem")
     for row in rows:
         event = {}
         for i, cell in enumerate(row.select(".z-listcell-content")):
@@ -52,28 +54,35 @@ def get_events(src):
                 if "display:none" not in span.get("style", ""):
                     content.append(span.text)
             event[keys.cellkeys[i]] = content
-        events.append(event)
+        event_list.append(event)
     
-    for i, event in enumerate(events):
+    # Add date to each event
+    for i, event in enumerate(event_list):
         if len(event) == 3:
             event["date"] = event["departure"][0].split()
         else:
-            event["date"] = events[i - 1]["date"]
+            event["date"] = event_list[i - 1]["date"]
     
-    return list(filter(lambda i: len(i) != 4, events))
+    # Delete pseudo events  that contain date for events for that day
+    return list(filter(lambda i: len(i) != 4, event_list))
 
 
 def process_event(event, calendar, dirurl):
+    # Checks if event is a training or reserve or a deadheading flight
+    # and add the event to Google Calendar or update it if it exists
+
     if len(event["event"]) == 0:
         # ToDo: handle trainings better
         event["event"] = ["TRAINING: " + event["comment"][-1]]
-    fnumber = event["event"][0]
-    dep = event["departure"][-1]
-    arr = event["arrival"][-1]
-    ac = event["event"][-1]
 
+    flight_number = event["event"][0]
+    departure     = event["departure"][-1]
+    arrival       = event["arrival"][-1]
+
+    ac = event["event"][-1]
     ac = ac.replace(" / B" , " / UP-B" )
     ac = ac.replace(" / CJ", " / UP-CJ")
+
     dirurl = dirurl + ac.split()[-1]
     
     for i in range(len(event["crew"])):
@@ -81,15 +90,15 @@ def process_event(event, calendar, dirurl):
     crew = "\n".join(event["crew"])
     
     if "Passenger on task" in event["info"]:
-        title = f"{dep}-{arr} {fnumber} (PAX)"
+        title = f"{departure}-{arrival} {flight_number} (PAX)"
     elif "TRAINING" in event["event"][0]:
-        title = fnumber
+        title = flight_number
         dirurl = ""
     elif "Резерв" in event["event"][0]:
-        title = fnumber = "RESERVE"
+        title = flight_number = "RESERVE"
         dirurl = ""
     else:
-        title = f"{dep}-{arr} {fnumber}"
+        title = f"{departure}-{arrival} {flight_number}"
     
     start = datetime.datetime.strptime(
             event["date"][0] + event["departure"][0], "%d.%m.%Y%H:%M")
@@ -101,13 +110,13 @@ def process_event(event, calendar, dirurl):
     if " (+1)" in event["arrival"]:
         end += datetime.timedelta(days=1)
     
-    logging.info(f"Current event:\t{start.date().isoformat()} {fnumber}")
+    logging.info(f"Current event:\t{start.date().isoformat()} {flight_number}")
     existing = list(calendar.get_events(time_min=start.date(),
                     time_max=end.date(), query=title, timezone="Etc/UTC"))
     if existing:
-        print(f"{fnumber}:\t"
+        print(f"{flight_number}:\t"
               f"{str(existing[0].start)[:16]} - {str(existing[0].end)[:16]}")
-        print(f"{fnumber}:\t"
+        print(f"{flight_number}:\t"
               f"{str(start)[:16]} - {str(end)[:16]}")
         existing[0].start = start
         existing[0].end = end
@@ -115,25 +124,26 @@ def process_event(event, calendar, dirurl):
                                    "\n\n" + "Generated by mer2gc")
         calendar.update_event(existing[0])
         return
-    gcevent = Event(title, start, end)
-    gcevent.timezone = "Etc/UTC"
+    google_calendar_event = Event(title, start, end)
+    google_calendar_event.timezone = "Etc/UTC"
     if title != "RESERVE":
-        gcevent.location = keys.locations.get(arr, "Unknown location")
+        google_calendar_event.location = keys.locations.get(arrival,
+                                                            "Unknown location")
     else:
         last_event = list(calendar.get_events(time_min=datetime.datetime.now() -
                                               datetime.timedelta(days=30),
                                               time_max=start))[-1]
-        gcevent.location = last_event.location
-    gcevent.add_popup_reminder(minutes_before_start=180)
-    gcevent.description = ac + "\n" + dirurl + "\n\n" + crew + \
+        google_calendar_event.location = last_event.location
+    google_calendar_event.add_popup_reminder(minutes_before_start=180)
+    google_calendar_event.description = ac + "\n" + dirurl + "\n\n" + crew + \
                           "\n\n" + "Generated by mer2gc"
     print(f"Generated event:\t{title}")
-    calendar.add_event(gcevent)
+    calendar.add_event(google_calendar_event)
     logging.info("Event added")
 
 
-def check_documents(src):
-    docs = src.select(".main-template-header span")[2].text
+def check_documents(source):
+    docs = source.select(".main-template-header span")[2].text
     if docs != "0": print(f"You have {docs} unaquainted documents!")
 
 
@@ -158,12 +168,12 @@ def main():
         logging.basicConfig(format="[%(levelname)s]\t%(message)s",
                             level=logging.INFO, stream=sys.stdout)
 
-    src = get_pagesource(conf['url'], conf['login'], conf['password'])
-    events = get_events(src)
+    source = get_pagesource(conf['url'], conf['login'], conf['password'])
+    events = get_events(source)
     for event in events:
         process_event(event, calendar, conf["dirurl"])
     
-    check_documents(src)
+    check_documents(source)
 
 
 if __name__ == "__main__":
