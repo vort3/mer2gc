@@ -71,7 +71,11 @@ def process_event(event, calendar, dirurl):
     # Checks if event is a training or reserve or a deadheading flight
     # and add the event to Google Calendar or update it if it exists
 
-    if len(event["event"]) == 0:
+    if '/' in event["departure"][-1]:
+        # ToDo: handle vacations better
+        return
+
+    elif len(event["event"]) == 0:
         # ToDo: handle trainings better
         event["event"] = ["TRAINING: " + event["comment"][-1]]
 
