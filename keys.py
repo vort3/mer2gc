@@ -25,6 +25,7 @@ locations = {
     "MCT": "Muscat International Airport, Muscat, Oman",
     "MED": "Prince Mohammed Bin Abdulaziz International Airport, Medina Saudi Arabia",
     "MRV": "Aeroport Mineral'nyye Vody, Mineralnye Vody, Stavropol Krai, Russia, 357205",
+    "NCU": "Nukus International Airport, FJM8+727, A. Dosnazarov ko'shesi, Nukus, Uzbekistan",
     "NQZ": "International airport \"Astana\", Nur-Sultan 020000, Kazakhstan",
     "NRT": "Narita International Airport, 1-1 Furugome, Narita, Chiba 282-0004, Japan",
     "OSS": "Osh International Airport, Osh, Kyrgyzstan",
