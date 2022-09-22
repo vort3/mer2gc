@@ -91,7 +91,8 @@ def process_event(event, calendar, dirurl):
     
     for i in range(len(event["crew"])):
         event["crew"][i] = event["crew"][i].replace(" 7", " +7", 1)
-    crew = "\n".join(event["crew"])
+    crew = sorted(event["crew"], key=lambda s: "[pax]" in s)
+    crew = "\n".join(crew)
     
     if "Passenger on task" in event["info"]:
         title = f"{departure}-{arrival} {flight_number} (PAX)"
