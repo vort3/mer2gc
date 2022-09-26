@@ -90,7 +90,7 @@ def process_event(event, calendar, dirurl):
     dirurl = dirurl + ac.split()[-1]
     
     for i in range(len(event["crew"])):
-        event["crew"][i] = event["crew"][i].replace(" 7", " +7", 1)
+        event["crew"][i] = event["crew"][i].replace(" 7", " +7", 2)
     crew = sorted(event["crew"], key=lambda s: "[pax]" in s)
     crew = "\n".join(crew)
     
