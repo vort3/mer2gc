@@ -11,6 +11,7 @@ locations = {
     "DAC": "Hazrat Shahjalal International Airport",
     "DMB": "Taraz Airport, ул. Аэропорт б/н, Taraz 080000, Kazakhstan",
     "DWC": "Al Maktoum International Airport, Emirates Rd - Dubai - United Arab Emirates",
+    "EVN": "Zvartnots International Airport (EVN), Yerevan, Armenia",
     "GUW": "Atyrau International Airport, Abulkhair Khan Ave 22, Atyrau 060000, Kazakhstan",
     "GYD": "Heydar Aliyev International Airport, AZ1109, settlement, Baku, Azerbaijan",
     "HAK": "Haikou Meilan International Airport, Meilan, Haikou, Hainan, China, 571126",
