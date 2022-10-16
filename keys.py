@@ -23,6 +23,7 @@ locations = {
     "KOV": "Kokshetau Airport, а/я 432, г.Кокшетау 020004, Kazakhstan",
     "KRR": "Krasnodar International Airport, Ulitsa Yevdokii Bershanskoy, 355, Krasnodar, Krasnodarskiy kray, Russia, 350912",
     "KSN": "Airport Kostanay, Oral Street 39, Kostanay 110000, Kazakhstan",
+    "LED": "Pulkovo Airport (LED), Pulkovskoye Shosse, Saint Petersburg, Russia",
     "MCT": "Muscat International Airport, Muscat, Oman",
     "MED": "Prince Mohammed Bin Abdulaziz International Airport, Medina Saudi Arabia",
     "MRV": "Aeroport Mineral'nyye Vody, Mineralnye Vody, Stavropol Krai, Russia, 357205",
