@@ -8,6 +8,7 @@ locations = {
     "BQS": "Ignatievo Airport, Ignatyevskaya Rd, Blagoveshchensk, Amurskaya oblast', Russia, 675019",
     "BUD": "Budapest Airport, Budapest, 1185 Hungary",
     "CIT": "Airport, 9F8V+F6G, Shymkent, Kazakhstan",
+    "CXR": "Cam Ranh International Airport, Nguyễn Tất Thành, Cam Nghĩa, Cam Lâm District, Khánh Hòa, Vietnam",
     "DAC": "Hazrat Shahjalal International Airport",
     "DMB": "Taraz Airport, ул. Аэропорт б/н, Taraz 080000, Kazakhstan",
     "DWC": "Al Maktoum International Airport, Emirates Rd - Dubai - United Arab Emirates",
