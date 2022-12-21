@@ -43,6 +43,7 @@ locations = {
     "UGC": "Urgench International Airport",
     "UKK": "Aeroport Ust'-Kamenogorska, Ust'-Kamenogorsk 070000, Kazakhstan",
     "URA": "Ақжол халықаралық әуежайы, Тұқпай, Kazakhstan",
+    "UTP": "U-Tapao–Rayong–Pattaya International Airport, Sukhumvit Road, Phla, Ban Chang District, Rayong, Thailand",
     "VKO": "Vnukovo International Airport, Vnukovo, Moscow Oblast, Russia",
     "VNO": "Vilnius International Airport, Rodūnios kl. 10A, Vilnius 02189, Lithuania",
     "XIY": "Xi'an Xianyang International Airport, Weicheng, Xianyang, Shaanxi, China",
