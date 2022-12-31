@@ -32,6 +32,7 @@ locations = {
     "NQZ": "International airport \"Astana\", Nur-Sultan 020000, Kazakhstan",
     "NRT": "Narita International Airport, 1-1 Furugome, Narita, Chiba 282-0004, Japan",
     "OSS": "Osh International Airport, Osh, Kyrgyzstan",
+    "OVB": "Novosibirsk International Airport (Tolmachevo) (OVB), Ob, Novosibirsk Oblast, Russia",
     "PPK": "Aeroport Petropavlovsk, 150000, Kazakhstan",
     "PWQ": "«Pavlodar» äwejayı, 140000, Kazakhstan",
     "SAW": "Sabiha Gokcen International Airport, Sanayi, 34906 Pendik/İstanbul, Turkey",
