@@ -38,6 +38,7 @@ locations = {
     "SAW": "Sabiha Gokcen International Airport, Sanayi, 34906 Pendik/İstanbul, Turkey",
     "SCO": "Aktau Airport",
     "SSH": "Sharm El Sheikh International Airport, 2 El-Salam, Qesm Sharm Ash Sheikh, South Sinai Governorate, Egypt",
+    "SVO": "Sheremetyevo - A.S. Pushkin international airport, Khimki, Russia",
     "SYX": "Sanya Phoenix International Airport, Fenghuangzhen, Tianya, Sanya, Hainan, China, 572000",
     "TBS": "Tbilisi International Airport",
     "TSE": "Nursultan Nazarbayev International Airport, Astana 020000, Kazakhstan",
