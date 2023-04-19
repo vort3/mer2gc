@@ -35,7 +35,7 @@ def get_pagesource(url, login, password):
         driver.find_element(By.CLASS_NAME, "z-button").click()
         driver.get(url + "/web.meridian/workplan.zul")
         WebDriverWait(driver, 30).until(EC.visibility_of_element_located(
-                                    (By.CLASS_NAME, "fio")))
+                                    (By.CLASS_NAME, "z-listitem")))
         source = BeautifulSoup(driver.page_source, "html.parser")
         logging.debug(source)
         return source
