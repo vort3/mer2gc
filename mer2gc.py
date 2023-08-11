@@ -154,7 +154,10 @@ def check_documents(source):
 
 def main():
     configpath = os.path.join(os.path.expanduser("~"), ".config", "mer2gc")
-    with open(os.path.join(configpath, "config.json")) as fp:
+    
+    config = sys.argv[-1] if "-c" in sys.argv else "config.json"
+    
+    with open(os.path.join(configpath, config)) as fp:
         conf = json.load(fp)
     
     SCOPES = ['https://www.googleapis.com/auth/calendar']
