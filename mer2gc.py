@@ -28,8 +28,17 @@ def get_pagesource(url, login, password):
 
     with webdriver.Firefox(options=opt, service=s) as driver:
         driver.get(url)
-        WebDriverWait(driver, 30).until(EC.visibility_of_element_located(
-                                       (By.CLASS_NAME, "z-button")))
+        
+        retries = 0
+        while retries <= 5:
+            try:
+                WebDriverWait(driver, 30).until(EC.visibility_of_element_located(
+                                               (By.CLASS_NAME, "z-button")))
+                break
+            except TimeoutException:
+                driver.refresh()
+                retries += 1
+        
         driver.find_elements(By.CLASS_NAME, "z-textbox")[0].send_keys(login)
         driver.find_elements(By.CLASS_NAME, "z-textbox")[1].send_keys(password)
         driver.find_element(By.CLASS_NAME, "z-button").click()
