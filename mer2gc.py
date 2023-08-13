@@ -86,7 +86,7 @@ def process_event(event, calendar, dirurl):
 
     elif len(event["event"]) == 0:
         # ToDo: handle trainings better
-        event["event"] = ["TRAINING: " + event["comment"][-1]]
+        event["event"] = ["TRN " + event["comment"][-1]]
 
     flight_number = event["event"][0]
     departure     = event["departure"][-1]
@@ -105,7 +105,7 @@ def process_event(event, calendar, dirurl):
     
     if "Passenger on task" in event["info"]:
         title = f"{departure}-{arrival} {flight_number} (PAX)"
-    elif "TRAINING" in event["event"][0]:
+    elif "TRN" in event["event"][0]:
         title = flight_number
         dirurl = ""
     elif "Резерв" in event["event"][0]:
@@ -129,9 +129,9 @@ def process_event(event, calendar, dirurl):
                     time_max=end.date(), query=title, timezone="Etc/UTC"))
     if existing:
         print(f"{flight_number}:\t"
-              f"{str(existing[0].start)[:16]} - {str(existing[0].end)[:16]}")
-        print(f"{flight_number}:\t"
-              f"{str(start)[:16]} - {str(end)[:16]}")
+              f"{str(existing[0].start)[:16]} - {str(existing[0].end)[11:16]}")
+        print("—" * len(flight_number) + "> "
+              f"{str(start)[:16]} - {str(end)[11:16]}")
         existing[0].start = start
         existing[0].end = end
         existing[0].description = (ac + "\n" + dirurl + "\n\n" + crew +
