@@ -1,15 +1,9 @@
 #!/usr/bin/env python3
 
-from selenium import webdriver
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.service import Service
-from selenium.webdriver.common.by import By
+from playwright.sync_api import sync_playwright, expect
 from google.oauth2 import service_account
 from gcsa.google_calendar import GoogleCalendar
 from gcsa.event import Event
-from bs4 import BeautifulSoup
 import keys
 import datetime
 import logging
@@ -18,50 +12,38 @@ import sys
 import os
 
 
-def get_pagesource(url, login, password):
-    # Page source is a raw html source of rendered web page
+def get_page(url, login, password):
+    # Page is a browser page (tab) object
 
-    opt = Options()
-    opt.headless = True
-    opt.add_argument("-private")
-    s = Service('/usr/bin/geckodriver', log_path=os.devnull)
-
-    with webdriver.Firefox(options=opt, service=s) as driver:
-        driver.get(url)
-        
-        retries = 0
-        while retries <= 5:
-            try:
-                WebDriverWait(driver, 30).until(EC.visibility_of_element_located(
-                                               (By.CLASS_NAME, "z-button")))
-                break
-            except TimeoutException:
-                driver.refresh()
-                retries += 1
-        
-        driver.find_elements(By.CLASS_NAME, "z-textbox")[0].send_keys(login)
-        driver.find_elements(By.CLASS_NAME, "z-textbox")[1].send_keys(password)
-        driver.find_element(By.CLASS_NAME, "z-button").click()
-        driver.get(url + "/web.meridian/workplan.zul")
-        WebDriverWait(driver, 30).until(EC.visibility_of_element_located(
-                                    (By.CLASS_NAME, "z-listitem")))
-        source = BeautifulSoup(driver.page_source, "html.parser")
-        logging.debug(source)
-        return source
+    playwright = sync_playwright().start()
+    browser = playwright.firefox.launch()
+    page = browser.new_page()
+    page.goto(url)
+    
+    textboxes = page.get_by_role("textbox").all()
+    textboxes[1].fill(login)
+    textboxes[2].fill(password)
+    page.get_by_role("button").first.click()
+    
+    expect(page).to_have_url("https://meridian.scat.kz/web.meridian/welcome.zul")
+    page.goto(url + "/web.meridian/workplan.zul")
+    logging.debug(page)
+    return page, browser
 
 
-def get_events(source):
+def get_events(page):
     event_list = []
 
-    rows = source.select(".z-listitem")
+    expect(page.locator(".z-listitem").first).not_to_be_empty(timeout=30000)
+    rows = page.locator(".z-listitem").all()
     for row in rows:
         event = {}
-        for i, cell in enumerate(row.select(".z-listcell-content")):
+        for i, cell in enumerate(row.locator(".z-listcell-content").all()):
             content = []
             selector = ".popup-crew-list span" if i == 4 else "span"
-            for span in cell.select(selector):
-                if "display:none" not in span.get("style", ""):
-                    content.append(span.text)
+            for span in cell.locator(selector).all():
+                if span.get_attribute("style") != "display:none;":
+                    content.append(span.inner_text())
             event[keys.cellkeys[i]] = content
         event_list.append(event)
     
@@ -103,6 +85,7 @@ def process_event(event, calendar, dirurl):
     crew = sorted(event["crew"], key=lambda s: "[pax]" in s)
     crew = "\n".join(crew)
     
+    logging.info(event)
     if "Passenger on task" in event["info"]:
         title = f"{departure}-{arrival} {flight_number} (PAX)"
     elif "TRN" in event["event"][0]:
@@ -156,8 +139,8 @@ def process_event(event, calendar, dirurl):
     logging.info("Event added")
 
 
-def check_documents(source):
-    docs = source.select(".main-template-header span")[2].text
+def check_documents(page):
+    docs = page.locator(".main-template-header span").all()[2].inner_text()
     if docs != "0": print(f"You have {docs} unaquainted documents!")
 
 
@@ -185,12 +168,13 @@ def main():
         logging.basicConfig(format="[%(levelname)s]\t%(message)s",
                             level=logging.INFO, stream=sys.stdout)
 
-    source = get_pagesource(conf['url'], conf['login'], conf['password'])
-    events = get_events(source)
+    page, browser = get_page(conf['url'], conf['login'], conf['password'])
+    events = get_events(page)
     for event in events:
         process_event(event, calendar, conf["dirurl"])
     
-    check_documents(source)
+    check_documents(page)
+    browser.close()
 
 
 if __name__ == "__main__":
