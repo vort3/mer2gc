@@ -59,7 +59,7 @@ def get_events(page):
 
 
 def process_event(event, calendar, dirurl):
-    # Checks if event is a training or reserve or a deadheading flight
+    # Check if event is a training or reserve or a deadheading flight
     # and add the event to Google Calendar or update it if it exists
 
     if '/' in event["departure"][-1]:
@@ -104,7 +104,7 @@ def process_event(event, calendar, dirurl):
             event["date"][0] + event["arrival"][0], "%d.%m.%Y%H:%M")
     end   = end.replace(tzinfo=datetime.timezone.utc)
 
-    if " (+1)" in event["arrival"]:
+    if "(+1)" in event["arrival"]:
         end += datetime.timedelta(days=1)
     
     logging.info(f"Current event:\t{start.date().isoformat()} {flight_number}")
