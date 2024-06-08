@@ -108,7 +108,7 @@ def process_event(event, calendar, dirurl):
         end += datetime.timedelta(days=1)
     # Trying to fix events with negative duration
     if end < start:
-        start, end = end, start
+        end += datetime.timedelta(days=1)
     
     logging.info(f"Current event:\t{start.date().isoformat()} {flight_number}")
     existing = list(calendar.get_events(time_min=start.date(),
