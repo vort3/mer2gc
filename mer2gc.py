@@ -4,12 +4,12 @@ from playwright.sync_api import sync_playwright, expect
 from google.oauth2 import service_account
 from gcsa.google_calendar import GoogleCalendar
 from gcsa.event import Event
+from pathlib import Path
 import keys
 import datetime
 import logging
 import json
 import sys
-import os
 
 
 def get_page(url, login, password):
@@ -148,15 +148,15 @@ def check_documents(page):
 
 
 def main():
-    configpath = os.path.join(os.path.expanduser("~"), ".config", "mer2gc")
+    configpath = Path.home() / '.config' / 'mer2gc'
     
     config = sys.argv[-1] if "-c" in sys.argv else "config.json"
     
-    with open(os.path.join(configpath, config)) as fp:
-        conf = json.load(fp)
+    fp = configpath / config
+    conf = json.loads(fp.read_text())
     
     SCOPES = ['https://www.googleapis.com/auth/calendar']
-    SERVICE_ACCOUNT_FILE = os.path.join(configpath, "serviceacct.json")
+    SERVICE_ACCOUNT_FILE = configpath / 'serviceacct.json'
     credentials = service_account.Credentials.from_service_account_file(
                   SERVICE_ACCOUNT_FILE, scopes=SCOPES)
     calendar = GoogleCalendar(conf['calendar'], credentials=credentials)
