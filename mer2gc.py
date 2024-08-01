@@ -71,8 +71,8 @@ def process_event(event, calendar, dirurl):
         event["event"] = ["TRN " + event["comment"][-1]]
 
     flight_number = event["event"][0]
-    departure     = event["departure"][-1]
-    arrival       = event["arrival"][-1]
+    departure     = event["departure"][-2]
+    arrival       = event["arrival"][-2]
 
     ac = event["event"][-1]
     ac = ac.replace(" / B" , " / UP-B" )
